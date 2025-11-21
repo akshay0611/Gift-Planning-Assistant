@@ -156,14 +156,13 @@ graph TD
    ```
 
 4. **Configure environment variables**
+   Create a `.env` file inside `gift_planning_assistant/` (there is no template in the repo):
    ```bash
-   cp .env.example .env
-   ```
-   
-   Edit `.env` and add your API key:
-   ```
+   cat <<'EOF' > gift_planning_assistant/.env
    GEMINI_API_KEY=your_actual_api_key_here
+   EOF
    ```
+   Replace the value with your Gemini key from Google AI Studio.
 
 5. **Verify installation**
    ```bash

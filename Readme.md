@@ -207,6 +207,74 @@ Run the agent programmatically:
 adk run
 ```
 
+### Option 4: FastAPI / Cloud Run API
+
+Run the HTTP server locally (uses the same ADK agent under the hood):
+
+```bash
+uvicorn server:app --reload
+```
+
+Send a test request:
+
+```bash
+curl -X POST http://127.0.0.1:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Help me plan a gift", "user_id": "demo"}'
+```
+
+## ☁️ Deploying to Cloud Run
+
+1. **Build the container locally (optional)**
+   ```bash
+   docker build -t gift-agent .
+   docker run -p 8080:8080 -e GEMINI_API_KEY=your_key gift-agent
+   ```
+2. **Configure gcloud**
+   ```bash
+   gcloud auth login
+   gcloud config set project YOUR_PROJECT_ID
+   gcloud services enable run.googleapis.com artifactregistry.googleapis.com
+   ```
+3. **Submit build to Cloud Build**
+   ```bash
+   gcloud builds submit --tag gcr.io/YOUR_PROJECT_ID/gift-agent
+   ```
+4. **Deploy to Cloud Run**
+   ```bash
+   gcloud run deploy gift-agent \
+     --image gcr.io/YOUR_PROJECT_ID/gift-agent \
+     --platform managed \
+     --region us-central1 \
+     --allow-unauthenticated \
+     --set-env-vars GEMINI_API_KEY=YOUR_GEMINI_KEY
+   ```
+5. **Test the deployed endpoint**
+   ```bash
+   curl -X POST https://gift-agent-<hash>-uc.a.run.app/chat \
+     -H "Content-Type: application/json" \
+     -d '{"message": "Hi there!"}'
+   ```
+
+Use Secret Manager (`--set-secrets`) instead of plain env vars for production deployments.
+
+## 🖥️ Custom Web UI
+
+The `/webui` folder contains a lightweight React single-page app. When the Docker image builds, it automatically runs `npm install && npm run build`, and the FastAPI server serves the compiled assets.
+
+- **Local dev**
+  ```bash
+  cd webui
+  npm install
+  npm start   # launches React dev server on port 3000
+  ```
+- **Build for server**
+  ```bash
+  npm run build
+  ```
+
+When the build output exists (`webui/build`), visiting the Cloud Run URL in a browser loads the SPA; all AJAX calls hit the same origin via the `/chat` endpoint.
+
 ## 💬 Example Conversation
 
 ```

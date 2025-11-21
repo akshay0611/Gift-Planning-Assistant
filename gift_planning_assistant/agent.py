@@ -36,7 +36,8 @@ from agents import (
 # Shared resources
 # ---------------------------------------------------------------------------
 
-APP_STATE_KEY = "gift_planning_assistant"
+# Store state in the user namespace so it persists across turns per ADK session.
+APP_STATE_KEY = "user:gift_planning_assistant"
 
 validate_config()
 _CLIENT = genai.Client(api_key=GEMINI_API_KEY)

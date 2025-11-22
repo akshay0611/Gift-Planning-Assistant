@@ -2,62 +2,83 @@
 
 ```
 Gift Planning Agent/
-├── main.py                          # CLI entry point
-├── requirements.txt                  # Python dependencies
-├── .env.example                      # Environment template
-├── .gitignore                        # Git ignore rules
-├── README.md                         # Main documentation
-├── gift_assistant.log                # Application logs
+├── main.py                          # CLI entry point (legacy)
+├── server.py                        # FastAPI server for deployment
+├── requirements.txt                 # Python dependencies
+├── Dockerfile                       # Container configuration
+├── .dockerignore                    # Docker ignore rules
+├── .gitignore                       # Git ignore rules
+├── README.md                        # Main documentation
+├── DOCUMENTATION.md                 # Additional docs
 │
-├── agents/                          # Agent modules
+├── gift_planning_assistant/         # Main package (ADK agent)
 │   ├── __init__.py
-│   ├── orchestrator.py              # Main orchestrator
-│   ├── recipient_manager.py         # Recipient management
-│   ├── occasion_tracker.py          # Occasion tracking
-│   ├── gift_finder.py               # Gift suggestions
-│   ├── budget_manager.py            # Budget tracking
-│   └── purchase_coordinator.py      # Price comparison
+│   ├── agent.py                    # ADK root agent + FunctionTools
+│   │
+│   ├── agents/                     # Helper modules
+│   │   ├── __init__.py
+│   │   ├── orchestrator.py         # Legacy orchestrator (not used in ADK)
+│   │   ├── recipient_manager.py    # Recipient management logic
+│   │   ├── occasion_tracker.py     # Occasion tracking logic
+│   │   ├── gift_finder.py          # Gift suggestion logic
+│   │   ├── budget_manager.py       # Budget tracking logic
+│   │   └── purchase_coordinator.py # Price comparison logic
+│   │
+│   ├── tools/                      # Custom tools
+│   │   ├── __init__.py
+│   │   ├── date_calculator.py      # Date utilities
+│   │   └── budget_calculator.py    # Budget utilities
+│   │
+│   ├── memory/                     # Memory management
+│   │   ├── __init__.py
+│   │   └── memory_manager.py       # Memory Bank implementation
+│   │
+│   ├── config/                     # Configuration
+│   │   ├── __init__.py
+│   │   └── settings.py             # App settings
+│   │
+│   └── .env                        # Environment variables (not in git)
 │
-├── tools/                           # Custom tools
+├── adk_app/                        # ADK CLI compatibility
 │   ├── __init__.py
-│   ├── date_calculator.py           # Date utilities
-│   └── budget_calculator.py         # Budget utilities
+│   └── agent.py                    # Imports root_agent for ADK
 │
-├── memory/                          # Memory management
-│   ├── __init__.py
-│   └── memory_manager.py            # Memory Bank implementation
-│
-├── config/                          # Configuration
-│   ├── __init__.py
-│   └── settings.py                  # App settings
-│
-└── adk_app/                         # ADK integration
-    └── __init__.py                  # Root agent export
+└── webui/                          # React frontend
+    ├── public/
+    ├── src/
+    │   ├── App.js                  # Main React component
+    │   ├── App.css                 # Styles
+    │   └── index.js                # Entry point
+    ├── package.json
+    └── build/                      # Production build (generated)
 ```
 
 ## 🔧 ADK Features Used
 
 This project demonstrates the following ADK capabilities:
 
-### 1. Multi-Agent Orchestration
-- **LlmAgent**: All 5 specialized agents use LLM-based reasoning
-- **SequentialAgent**: Profile → Gift Search → Price Comparison workflow
-- **ParallelAgent**: Gift Finder + Budget Manager run simultaneously
+### 1. Multi-Agent System via Tool-Based Architecture
+- **ADK Agent**: Root agent coordinates 5 specialized agent capabilities
+- **FunctionTools**: 10 custom tools expose agent functionality to the LLM
+- **Tool-Based Coordination**: Agents collaborate through shared tools and memory
+- **Specialized Agents**: RecipientManager, OccasionTracker, GiftFinder, BudgetManager, PurchaseCoordinator
 
 ### 2. Tools Integration
 - **Google Search Tool**: Real-time gift searches and price comparison
 - **Code Execution Tool**: Precise budget calculations and analysis
-- **Custom Tools**: Date calculator and budget analyzer
+- **Custom FunctionTools**: 10 tools for recipient, occasion, budget, gift, and purchase management
+- **Custom Utilities**: Date calculator and budget analyzer
 
 ### 3. Memory & State Management
-- **InMemorySessionService**: Conversation context across interactions
-- **Memory Bank Pattern**: Persistent storage of recipients, occasions, budgets
-- **Session State**: Shared state across all agents
+- **InMemorySessionService**: Conversation context across interactions (used in server.py)
+- **Memory Bank Pattern**: Session-based storage of recipients, occasions, budgets
+- **ToolContext State**: Shared state across all agent tool invocations
+- **Session Persistence**: Data persists across conversation turns
 
 ### 4. Model Configuration
 - **Gemini 2.0 Flash**: Using `gemini-2.0-flash`
-- **Streaming Support**: Ready for streaming responses
-- **Function Calling**: Structured tool interactions
+- **Tool Grounding**: All responses grounded in explicit tool calls
+- **Function Calling**: Structured tool interactions with type validation
 
 ## 🌟 Future Enhancements
 

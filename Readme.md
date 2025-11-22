@@ -35,11 +35,11 @@ The Gift Planning Assistant is an intelligent multi-agent system that:
 
 ## 🏗️ Architecture
 
-The system uses a **multi-agent orchestration pattern** with specialized agents:
+The system uses a **multi-agent architecture** coordinated through ADK's tool-based pattern:
 
 ```mermaid
 graph TD
-    A[User] --> B[Gift Planning Assistant<br/>Root Orchestrator]
+    A[User] --> B[Gift Planning Assistant<br/>Root Agent]
     B --> C[Recipient Manager]
     B --> D[Occasion Tracker]
     B --> E[Gift Finder]
@@ -63,46 +63,68 @@ graph TD
     style L fill:#ea4335,color:#fff
 ```
 
-### Agent Responsibilities
+### System Components
 
-1. **RecipientManagerAgent** 
-   - Manages recipient profiles (name, age, interests, relationship)
-   - Stores gift history to avoid duplicates
-   - Tracks preferences and style
+**1. Root Agent (ADK Agent)**
+- Gemini 2.0 Flash agent that coordinates all specialized capabilities
+- Equipped with 10 custom FunctionTools for gift planning workflows
+- Orchestrates multi-agent collaboration through tool invocation
 
-2. **OccasionTrackerAgent**
-   - Tracks birthdays, anniversaries, holidays, custom events
-   - Calculates days until occasions
-   - Manages reminder schedules
+**2. Specialized Agents (via FunctionTools)**
 
-3. **GiftFinderAgent** 
-   - Analyzes recipient profiles for personalization
-   - Uses Google Search to find current gift ideas
-   - Filters by budget and past gifts
-   - Ranks suggestions by relevance
+The system implements 5 specialized agents, each exposed through dedicated FunctionTools:
 
-4. **BudgetManagerAgent**
-   - Sets and tracks overall gift budget
-   - Monitors spending per recipient
-   - Calculates remaining budget
-   - Alerts on budget limits
-   - Uses Code Execution for precise calculations
+- **RecipientManagerAgent** 
+  - Tools: `add_recipient_profile`, `list_recipients`
+  - Manages recipient profiles (name, age, interests, relationship)
+  - Stores gift history to avoid duplicates
+  - Tracks preferences and style
 
-5. **PurchaseCoordinatorAgent**
-   - Searches for product availability
-   - Compares prices across retailers
-   - Provides purchase links
-   - Finds best deals
+- **OccasionTrackerAgent**
+  - Tools: `add_occasion_for_recipient`, `list_upcoming_occasions`, `calculate_days_until_event`
+  - Tracks birthdays, anniversaries, holidays, custom events
+  - Calculates days until occasions
+  - Manages reminder schedules
+
+- **GiftFinderAgent** 
+  - Tool: `generate_gift_ideas`
+  - Analyzes recipient profiles for personalization
+  - Uses Google Search to find current gift ideas
+  - Filters by budget and past gifts
+
+- **BudgetManagerAgent**
+  - Tools: `set_total_budget`, `record_gift_expense`, `get_budget_status`
+  - Sets and tracks overall gift budget
+  - Monitors spending per recipient
+  - Uses Code Execution for precise calculations
+  - Alerts on budget limits
+
+- **PurchaseCoordinatorAgent**
+  - Tool: `find_purchase_options`
+  - Searches for product availability
+  - Compares prices across retailers
+  - Provides purchase links
+
+**3. Memory Bank**
+- Session-based persistence using ADK's ToolContext state
+- Stores recipients, occasions, and budget data
+- Maintains context across conversation turns
+- Shared memory accessible to all agents
+
+**4. External Tools**
+- **Google Search** - Real-time gift and price discovery
+- **Code Execution** - Precise budget calculations
+- **Custom Calculators** - Date and budget utilities
 
 ## ✨ Features
 
 ### Core Capabilities
 
-- ✅ **Multi-Agent System** - Parallel and sequential agent execution
+- ✅ **Multi-Agent System** - 5 specialized agents coordinated through FunctionTools
 - ✅ **Google Search Integration** - Real-time gift and price searches
 - ✅ **Code Execution** - Precise budget calculations
 - ✅ **Custom Tools** - Date calculator, budget analyzer
-- ✅ **Memory Bank** - Persistent storage of recipients, occasions, budgets
+- ✅ **Memory Bank** - Session-based storage of recipients, occasions, budgets
 - ✅ **Session Management** - InMemorySessionService for conversation context
 - ✅ **Gemini 2.0 Flash** - Latest Gemini model for advanced reasoning
 
@@ -274,8 +296,3 @@ The `/webui` folder contains a lightweight React single-page app. When the Docke
   ```
 
 When the build output exists (`webui/build`), visiting the Cloud Run URL in a browser loads the SPA; all AJAX calls hit the same origin via the `/chat` endpoint.
-
-## 💬 Example Conversation
-
-```
-User: Add a new recipient named Sarah, she's 28, loves yoga and sustainable living
